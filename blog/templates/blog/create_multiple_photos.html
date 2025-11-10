@@ -1,0 +1,12 @@
+{% extends 'index.html' %}
+{% block content %}
+    <h2>Télécharger plusieurs photos</h2>
+    <form method="post" enctype="multipart/form-data">
+        <!-- le formset n'inclue rien qui sera vue par l'utilisateur -->
+         {{ formset.management_form }}
+        {{ formset.as_p }}
+        {% csrf_token %}
+        <button type="submit" >Publier</button>
+    </form>
+{% endblock content %}
+
