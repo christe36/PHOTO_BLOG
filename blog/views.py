@@ -12,10 +12,10 @@ def view_blog(request, blog_id):
 
 
 @login_required
-def home(request):
+def index(request):
     photos = models.Photo.objects.all()
     blogs = models.Blog.objects.all()
-    return render(request, 'blog/home.html', context={'photos': photos, 'blogs': blogs})
+    return render(request, 'blog/index.html', context={'photos': photos, 'blogs': blogs})
 
 
 @login_required
@@ -29,7 +29,7 @@ def photo_upload(request):
             photo.uploader = request.user
             # now we can save
             photo.save()
-            return redirect('home')
+            return redirect('index')
     return render(request, 'blog/photo_upload.html', context={'form': form})
 
 
@@ -48,7 +48,7 @@ def blog_and_photo_upload(request):
             blog.author = request.user
             blog.photo = photo
             blog.save()
-            return redirect('home')
+            return redirect('index')
     context = {
             'blog_form': blog_form,
             'photo_form': photo_form,
@@ -67,13 +67,13 @@ def edit_blog(request, blog_id):
             edit_form = forms.BlogForm(request.POST, instance=blog)
             if edit_form.is_valid():
                 edit_form.save()
-                return redirect('home')
+                return redirect('index')
         
         if 'delete_blog' in request.POST:
             delete_form = forms.DeleteBlogForm(request.POST)
             if delete_form.is_valid():
                 blog.delete()
-                return redirect('home')
+                return redirect('index')
 
     context = {
         'edit_form': edit_form,
@@ -96,5 +96,5 @@ def create_multiple_photos(request):
                     photo = form.save(commit=False)
                     photo.uploader = request.user
                     photo.save()
-            return redirect('home')
+            return redirect('index')
     return render(request, 'blog/create_multiple_photos.html', {'formset': formset})

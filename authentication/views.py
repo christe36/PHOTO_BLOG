@@ -22,7 +22,7 @@ def upload_profile_photo(request):
         form = forms.UploadProfilePhotoForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect('index')
     return render(request, 'authentication/upload_profile_photo.html', context={'form': form})
 
 

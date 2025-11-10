@@ -122,11 +122,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
+
 AUTH_USER_MODEL = 'authentication.User'  # personnalisation du modèle User
 # Une vue generique de connexion
 LOGIN_URL = 'login'
 # Une fois connecté, l'utilisateur sera redirigé vers cette page
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'index'
 # une vue generique de deconnexion
 LOGOUT_REDIRECT_URL = LOGIN_URL
 
