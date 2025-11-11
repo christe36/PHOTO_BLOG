@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.shortcuts import redirect, render
 
 from . import forms
@@ -26,7 +26,9 @@ def upload_profile_photo(request):
     return render(request, 'authentication/upload_profile_photo.html', context={'form': form})
 
 
-
+def logout_user(request):
+    logout(request)
+    return redirect('login')  
 
 
 
@@ -111,6 +113,4 @@ def upload_profile_photo(request):
     
     
     
-# def logout_user(request):
-#     logout(request)
-#     return redirect('login')    
+  

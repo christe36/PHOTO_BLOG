@@ -1,4 +1,5 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required,permission_required
+from django.db.models import Q
 from django.shortcuts import render,redirect
 from .import forms , models
 from django.shortcuts import get_object_or_404
@@ -13,9 +14,13 @@ def view_blog(request, blog_id):
 
 @login_required
 def index(request):
-    photos = models.Photo.objects.all()
-    blogs = models.Blog.objects.all()
-    return render(request, 'blog/index.html', context={'photos': photos, 'blogs': blogs})
+    photos = models.Photo.objects.filter(uploader__in=request.user.follows.all().exlude(blog__in=))
+    blogs = models.Blog.objects.filter(contributors__in=request.user.follows.all())
+    context = {
+        'blogs': blogs
+    }
+
+    return render(request, 'blog/index.html', context=context)
 
 
 @login_required
@@ -48,6 +53,7 @@ def blog_and_photo_upload(request):
             blog.author = request.user
             blog.photo = photo
             blog.save()
+            blog.contributors.add(request.user, through_defaults={'contribution': 'Auteur principal'})
             return redirect('index')
     context = {
             'blog_form': blog_form,
@@ -98,3 +104,33 @@ def create_multiple_photos(request):
                     photo.save()
             return redirect('index')
     return render(request, 'blog/create_multiple_photos.html', {'formset': formset})
+
+
+
+
+@login_required
+@permission_required('blog.add_photo', raise_exception=True)
+def photo_upload(request):
+    form = forms.PhotoForm()
+    if request.method == 'POST':
+        form = forms.PhotoForm(request.POST, request.FILES)
+        if form.is_valid():
+            photo = form.save(commit=False)
+            # « Attribuer l’utilisateur comme auteur (ou téléverseur) avant de sauvegarder le modèle.
+            photo.uploader = request.user
+            # Maintenant, nous pouvons sauvegarder
+            photo.save()
+            return redirect('index')
+    return render(request, 'blog/photo_upload.html', context={'form': form})
+
+
+
+@login_required
+def follow_users(request):
+    form = forms.FollowUsersForm(instance=request.user)
+    if request.method == 'POST':
+        form = forms.FollowUsersForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('index')
+    return render(request, 'blog/follow_users_form.html', context={'form': form})
